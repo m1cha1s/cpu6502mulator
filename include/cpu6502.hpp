@@ -7,31 +7,31 @@ using namespace mulator;
 
 namespace mulator::cpu6502
 {
+    using Byte = uint8_t;
+    using Word = uint16_t;
 
     class CPU6502
     {
     private:
-        uint8_t A;    // Accumulator
-        uint8_t X, Y; // Indexing registers
-        uint16_t SP;  // Stack pointer
-        uint16_t PC;  // Program counter
+        Byte A;    // Accumulator
+        Byte X, Y; // Indexing registers
+        Word SP;   // Stack pointer
+        Word PC;   // Program counter
 
-        uint8_t C : 1; // Carry flag
-        uint8_t Z : 1; // Zero flag
-        uint8_t I : 1; // Interrupt disable flag
-        uint8_t D : 1; // Decimal mode flag
-        uint8_t B : 1; // Break flag
-        uint8_t V : 1; // Overflow flag
-        uint8_t S : 1; // Sign flag
+        Byte C : 1; // Carry flag
+        Byte Z : 1; // Zero flag
+        Byte I : 1; // Interrupt disable flag
+        Byte D : 1; // Decimal mode flag
+        Byte B : 1; // Break flag
+        Byte V : 1; // Overflow flag
+        Byte S : 1; // Sign flag
 
-        mem::Mem memory; // The memory of the processor
+        Byte Reset : 1; // Reset flag for init puroses only
 
     public:
-        CPU6502() {}
-        CPU6502(mem::MemMap memMap)
+        CPU6502()
         {
-            memory = mem::Mem(memMap);
-
+            Reset = 1;
             A = X = Y = 0;                 // Clear registers
             C = Z = I = D = B = V = S = 0; // Clear all flags
 
@@ -40,7 +40,15 @@ namespace mulator::cpu6502
         }
         ~CPU6502() {}
 
+        std::string dumpRegs();
+
         void reset();
+        int execute(mem::Mem &memory); // Returns cycle count
     };
+
+    enum
+    {
+        LDA_IMM = 0xA9,
+    } OpCodes;
 
 }
